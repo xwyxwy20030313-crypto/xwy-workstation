@@ -200,8 +200,15 @@
     .top{padding:6px 10px;gap:6px}
     .top .bar-wrap{width:110px}
     .sign{margin:6px 8px;padding:8px 12px;font-size:14px}
-    .body{grid-template-columns:1fr;padding:0 8px 96px}
-    .nav{display:none}
+    .body{grid-template-columns:106px 1fr;padding:0 8px 96px}
+    /* 左侧完整导航栏(可上下滑动,不再收进更多) */
+    .nav{display:flex;flex-direction:column;gap:3px;padding:5px;position:sticky;top:0;align-self:start;max-height:calc(100vh - 104px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:#8a6d1a #5a4a2a}
+    .nav::-webkit-scrollbar{width:5px}
+    .nav::-webkit-scrollbar-thumb{background:#8a6d1a}
+    .nav .h{font-size:10px;margin-top:5px;padding:0 2px;white-space:nowrap}
+    .nav-item{flex:none;font-size:11px;padding:8px 3px;gap:3px}
+    .nav-item .em{width:16px;height:16px}
+    .nav-item img.em{width:16px;height:16px}
     .mtab{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--dark);border-top:3px solid #1a1008;z-index:99;padding-bottom:env(safe-area-inset-bottom)}
     .mtab-i{flex:1;text-align:center;color:#a09070;font-size:10px;padding:7px 0 6px;cursor:pointer;border-right:1px solid #1a1008}
     .mtab-i:last-child{border-right:none}
@@ -282,44 +289,9 @@
     </div>
 
     <div class="main">
-      <!-- ===== 手机首页:今天概览(≤640px 默认页) ===== -->
-      <div class="view" id="v-mhome">
-        <div class="m-hero">
-          <div class="d" id="mDate"></div>
-          <div class="hud">
-            <span class="l" id="mHudLv">Lv.7</span>
-            <span class="c" id="mHudCoin">1250 金币</span>
-            <span id="mHudHearts"></span>
-          </div>
-        </div>
-        <div class="panel">
-          <div class="ph">今日焦点</div>
-          <div class="m-focus" id="mFocus">…</div>
-          <div class="mini" style="margin-top:4px">完整任务清单在「更多→今日待办」</div>
-        </div>
-        <div class="panel pomo">
-          <div class="ph">番茄钟(ADHD 友好 · 中断不惩罚)</div>
-          <div class="pomo-time" id="mPomoTime">25:00</div>
-          <div class="mode" id="mPomoMode">准备开始 · 工作 25 分钟</div>
-          <div class="btnrow">
-            <button class="mc-btn" id="mPomoBtn" onclick="pomoToggle()">开始</button>
-            <button class="mc-btn blue" onclick="pomoReset()">重置</button>
-          </div>
-          <div class="cstat" id="mPomoCount">今日完成番茄:0 个</div>
-        </div>
-        <div class="m-actions">
-          <button class="m-big" onclick="mTab('money')">记一笔</button>
-          <button class="m-big blue" onclick="mTab('diary')">写日记</button>
-        </div>
-        <div class="panel">
-          <div class="ph">今天记了什么</div>
-          <div id="mTodayBrief" class="mini" style="line-height:1.9"></div>
-        </div>
-      </div>
-
-      <!-- ===== 手机更多页 ===== -->
+      <!-- ===== 手机设置页(同步/提醒/备份) ===== -->
       <div class="view" id="v-more">
-        <div class="page-h">更多功能</div>
+        <div class="page-h">设置 · 同步/提醒/备份</div>
         <div class="m-more-grid" id="mMoreGrid"></div>
         <div class="panel" style="margin-top:12px">
           <div class="ph">数据与提醒</div>
@@ -347,8 +319,12 @@
         <div class="mini" style="color:#8a7a5a">电脑端打开 workstation.html 用完整版(看板/仪表盘/英语/副业等);开了同步后手机数据会自动出现在电脑上</div>
       </div>
 
-      <!-- ===== 今天 ===== -->
+      <!-- ===== 今天(手机=桌面同一首页,顶部加秒记大按钮) ===== -->
       <div class="view on" id="v-home">
+        <div class="m-actions m-only" style="margin-top:2px">
+          <button class="m-big" onclick="mTab('money')">记一笔</button>
+          <button class="m-big blue" onclick="mTab('diary')">写日记</button>
+        </div>
         <div class="row3" style="margin-bottom:10px">
           <div class="scard"><div class="v v-hp" id="statTasks">0</div><div class="lbl">今日完成</div></div>
           <div class="scard"><div class="v v-green" id="statTotal">0</div><div class="lbl">任务总数</div></div>
@@ -846,12 +822,12 @@
 
   <!-- ===== 手机版:底部 5 Tab(≤640px 显示) ===== -->
   <div class="mtab" id="mtab">
-    <div class="mtab-i on" data-tab="mhome" onclick="mTab('mhome')"><svg width="24" height="24" viewBox="0 0 24 24"><rect x="2" y="9" width="20" height="13" fill="#8f7748" stroke="#3c2f1f" stroke-width="2"/><rect x="7" y="4" width="10" height="7" fill="#b8945c" stroke="#3c2f1f" stroke-width="2"/><rect x="10" y="13" width="4" height="7" fill="#2d1f0f"/></svg>今天</div>
+    <div class="mtab-i on" data-tab="home" onclick="mTab('home')"><svg width="24" height="24" viewBox="0 0 24 24"><rect x="2" y="9" width="20" height="13" fill="#8f7748" stroke="#3c2f1f" stroke-width="2"/><rect x="7" y="4" width="10" height="7" fill="#b8945c" stroke="#3c2f1f" stroke-width="2"/><rect x="10" y="13" width="4" height="7" fill="#2d1f0f"/></svg>今天</div>
     <div class="mtab-i" data-tab="money" onclick="mTab('money')"><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#f5c842" stroke="#8a6a1a" stroke-width="2"/><circle cx="12" cy="12" r="5.5" fill="none" stroke="#c9a227" stroke-width="1.5"/><rect x="10" y="5" width="4" height="4" fill="#ffe28a"/></svg>记账</div>
     <div class="mtab-i" data-tab="diary" onclick="mTab('diary')"><svg width="24" height="24" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" fill="#6b8a40" stroke="#3c2f1f" stroke-width="2"/><line x1="12" y1="4" x2="12" y2="20" stroke="#3c2f1f" stroke-width="2"/><rect x="6" y="8" width="3" height="2" fill="#e8e0c8"/><rect x="15" y="8" width="3" height="2" fill="#e8e0c8"/></svg>日记</div>
     <div class="mtab-i" data-tab="todo" onclick="mTab('todo')"><svg width="24" height="24" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" fill="#d03030" stroke="#3c2f1f" stroke-width="2"/><rect x="9" y="3" width="6" height="5" fill="#3a8a3a" stroke="#3c2f1f" stroke-width="2"/></svg>番茄</div>
     <div class="mtab-i" data-tab="fit" onclick="mTab('fit')"><svg width="24" height="24" viewBox="0 0 24 24"><rect x="2" y="9" width="5" height="6" fill="#7f7f7f" stroke="#3c2f1f" stroke-width="2"/><rect x="17" y="9" width="5" height="6" fill="#7f7f7f" stroke="#3c2f1f" stroke-width="2"/><rect x="7" y="11" width="10" height="2" fill="#8f7748" stroke="#3c2f1f" stroke-width="2"/></svg>健身</div>
-    <div class="mtab-i" data-tab="more" onclick="mTab('more')"><svg width="24" height="24" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="4" fill="#c6b89e" stroke="#3c2f1f" stroke-width="2"/><rect x="3" y="10" width="18" height="4" fill="#c6b89e" stroke="#3c2f1f" stroke-width="2"/><rect x="3" y="16" width="18" height="4" fill="#c6b89e" stroke="#3c2f1f" stroke-width="2"/></svg>更多</div>
+    <div class="mtab-i" data-tab="more" onclick="mTab('more')"><svg width="24" height="24" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="18" fill="#c6b89e" stroke="#3c2f1f" stroke-width="2"/><rect x="3" y="9" width="18" height="6" fill="#c6b89e" stroke="#3c2f1f" stroke-width="2"/><rect x="10" y="4" width="4" height="4" fill="#8a6a1a"/><rect x="10" y="16" width="4" height="4" fill="#8a6a1a"/></svg>设置</div>
   </div>
 
   <!-- ===== 提醒弹层(页面内 MC 风格) ===== -->
@@ -1039,14 +1015,14 @@ function goView(v){
 document.querySelectorAll('.nav-item').forEach(s=>s.addEventListener('click',()=>goView(s.dataset.view)));
 
 // ============ 手机版:底部 Tab ============
-const MTAB_MAP={mhome:'home',money:'money',diary:'diary',todo:'todo',fit:'fit',more:'more'};
+const MTAB_MAP={home:'home',money:'money',diary:'diary',todo:'todo',fit:'fit',more:'more'};
 function mTab(v){
   document.querySelectorAll('.mtab-i').forEach(x=>x.classList.toggle('on',x.dataset.tab===v));
   document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
-  document.getElementById('v-'+(v==='mhome'?'mhome':v)).classList.add('on');
-  // 同步桌面 nav 高亮(移动端 nav 隐藏,但保持状态一致)
+  document.getElementById('v-'+(MTAB_MAP[v]||v)).classList.add('on');
+  // 同步桌面 nav 高亮(移动端左侧导航可见,保持状态一致)
   document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('on',x.dataset.view===(MTAB_MAP[v]||v)));
-  if(v==='mhome') renderMHome();
+  if(v==='home'){ loadBriefing(); renderFocus(); updateStats(); }
   if(v==='money'){ renderMoney(); renderMKeypad(); renderMCats(); mNeedPick(document.getElementById('moneyNeed').value); }
   if(v==='diary'){ renderDiary(); renderMood(); }
   if(v==='todo'){ renderPomo(); renderTasks(); renderHabits(); }
@@ -1962,46 +1938,9 @@ function mSaveMoney(sign){
   mAmtStr='0'; document.getElementById('mAmt').textContent='¥0';
   document.getElementById('mNote').value='';
   renderMCats();
-  renderMHome();
 }
 
-// ============ 手机版:今天概览 ============
-function renderMHome(){
-  const d=new Date(), w=['日','一','二','三','四','五','六'][d.getDay()];
-  const md=document.getElementById('mDate');
-  if(md) md.textContent=(d.getMonth()+1)+'月'+d.getDate()+'日 周'+w;
-  const lv=document.getElementById('mHudLv'), cc=document.getElementById('mHudCoin');
-  if(lv) lv.textContent='Lv.'+state.lv;
-  if(cc) cc.textContent=state.coin+' 金币';
-  // 今日焦点:最高优先级未完成任务
-  const top=state.tasks.filter(t=>!t.done).sort((a,b)=>{
-    const o={P0:0,P1:1,P2:2,P3:3,通用:4}; return (o[a.p]??3)-(o[b.p]??3);
-  })[0];
-  const mf=document.getElementById('mFocus');
-  if(mf) mf.innerHTML=top
-    ? `<span style="color:#3c2f1f">${top.c}</span><div style="font-size:12px;color:#8a7a5a;margin-top:2px">${top.d} · ${top.p}</div>`
-    : '今天没有待办任务';
-  // 今天记了什么
-  const brief=document.getElementById('mTodayBrief');
-  if(brief){
-    const parts=[];
-    const moneyIn=state.money.filter(m=>new Date(m.t.replace(/-/g,'/')).toDateString()===d.toDateString()).reduce((s,m)=>s+m.a,0);
-    if(state.money.length) parts.push('记账 '+state.money.length+' 笔'+(moneyIn?' · 今日净 '+moneyIn+' 元':''));
-    if(state.diary.length) parts.push('日记 '+state.diary.length+' 条');
-    if(state.mood.length) parts.push('心情 '+state.mood.length+' 次');
-    const today=new Date().toDateString();
-    const exT=state.ex.filter(x=>x.d===d.toLocaleDateString()).length;
-    const spT=state.sport.filter(x=>x.d===d.toLocaleDateString()).length;
-    if(exT||spT) parts.push('健身 '+(exT+spT)+' 条');
-    if(state.habits.fit.includes(today)) parts.push('健身已打卡');
-    if(state.habits.study.includes(today)) parts.push('学习已打卡');
-    brief.textContent=parts.length?parts.join(' · '):'今天还没记,点下面按钮开始';
-  }
-  renderPomo();
-  updateStats();
-}
-
-// ============ 手机版:更多页 ============
+// ============ 手机版:设置页 ============
 const MORE_ITEMS=[['todo','今日待办'],['board','看板'],['dash','仪表盘'],['money','收支记账'],['diary','日记'],['ainews','AI 新闻'],['study','学习计划'],['english','英语练习'],['review','每日复盘'],['craft','AI 工作台'],['projects','项目'],['side','副业'],['fit','健身'],['home','桌面首页']];
 function renderMore(){
   const el=document.getElementById('mMoreGrid');
@@ -2089,7 +2028,7 @@ function renderAll(){
   renderFocus(); renderTasks(); renderMoney(); renderDiary(); renderStudy(); renderEnglish();
   renderHabits(); renderWeight(); renderNut(); renderEx(); renderSport(); renderMood(); renderWb();
   renderAch(); renderSide(); renderBoard(); renderDash(); renderDragon(); renderPomo();
-  updateStats(); renderMHome();
+  updateStats();
 }
 
 // ============ 初始化 ============
@@ -2097,7 +2036,7 @@ renderFocus(); renderTasks(); renderMoney(); renderDiary(); renderStudy(); rende
 renderHabits(); renderWeight(); renderNut(); renderEx(); renderSport(); renderMood(); renderWb(); renderAch(); renderSide(); renderBoard(); renderDash(); renderDragon(); renderPomo(); updateStats();
 checkBridge(); loadBriefing(); loadProjects();
 // 手机版入口:窄屏默认显示「今天概览」,宽屏保持桌面首页
-if(window.innerWidth<=640){ mTab('mhome'); } else { renderMHome(); }
+if(window.innerWidth<=640){ mTab('home'); }
 renderMore();
 // 同步:加载后立即 + 每 30 秒
 syncNow();
