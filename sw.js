@@ -1,7 +1,7 @@
 /* XWY 工作台 Service Worker
  * 说明:仅 https 或 localhost 环境可注册(局域网 http 下浏览器自动拒绝,页面静默降级)。
  * 缓存策略:静态资源缓存优先; /api/ 请求永远走网络。 */
-const CACHE = 'xwy-ws-v3';
+const CACHE = 'xwy-ws-v4';
 const ASSETS = ['./', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', function (e) {
