@@ -190,9 +190,9 @@
   body::-webkit-scrollbar{width:10px}
   body::-webkit-scrollbar-thumb{background:#8a6d1a;border:2px solid #5a4a2a}
   body::-webkit-scrollbar-track{background:#5a4a2a}
-  @media(max-width:760px){ .body{grid-template-columns:1fr} .row2,.row3,.grid2,.grid4{grid-template-columns:1fr} .nav{flex-direction:row;flex-wrap:wrap} .nav-item{flex:1 1 42%} }
+  @media(max-width:760px){ .body{grid-template-columns:1fr} .row2,.row3,.grid2,.grid4{grid-template-columns:1fr} }
 
-  /* ===== 手机版(≤640px):底部 Tab + 一屏录入 + 触控放大 ===== */
+  /* ===== 手机版(≤900px):左侧导航固定可滚动 + 底部 Tab ===== */
   .mtab{display:none}
   .m-only{display:none}
   #mcAlertBox{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:199;display:none;align-items:center;justify-content:center}
@@ -315,6 +315,10 @@
             <button class="checkin" id="remindBtn" onclick="remindToggle()">开启</button>
           </div>
           <div class="cstat" id="remindStat">提醒时间到且页面开着时,弹出 MC 风格提醒</div>
+          <div class="line" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            <span>版本</span>
+            <span class="cstat" id="verTag" style="font-weight:700;color:#8a6d1a">v9</span>
+          </div>
           <div class="line" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
             <span>手动备份</span>
             <button class="checkin" onclick="exportData()">导出数据</button>
