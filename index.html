@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#3c2f1f">
-<title>XWY 日常小镇 · 工作台 v3</title>
+<title>MC 工作台</title>
 <style>
   :root{
     --dirt:#8b6b3a; --stone:#7f7f7f; --sand:#c6b89e; --wood:#b8945c;
@@ -256,6 +256,39 @@
     .dur{min-height:44px;font-size:14px}
     .pomo-time{font-size:44px}
   }
+
+  /* ===== v11 · AI 食物估算 / ADHD 吃饭守卫 ===== */
+  .food-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed #b8a888}
+  .food-item .nm{font-weight:700;color:#2d2318;font-size:13px}
+  .food-item .pt{font-size:11px;color:#52401f}
+  .food-item .nt{font-size:12px;color:#6b4a20;white-space:nowrap;font-weight:700}
+  .food-sum{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
+  .prow{display:flex;justify-content:space-between;font-size:12px;color:#3c2f1f;margin-top:2px}
+  .pbar{height:9px;background:#ddcfb2;border:1px solid #7a6b4e;margin:3px 0 7px;position:relative;overflow:hidden}
+  .pbar i{display:block;height:100%;background:#4a7c2f;transition:width .35s}
+  .pbar i.warn{background:#c98a1e}
+  .pbar i.over{background:#a83232}
+  .adhd-tip{background:#3c2f1f;color:#eee6d0;padding:10px 12px;border-left:5px solid #f5c842;font-size:13px;line-height:1.65}
+  .adhd-tip b{color:#f5c842}
+  .qfood{display:inline-block;margin:4px 5px 0 0;padding:7px 10px;background:#e3d6b8;border:2px solid #7a6b4e;
+    font-size:12px;cursor:pointer;color:#2d2318;font-family:inherit;box-shadow:1px 1px 0 #7a6b4e}
+  .qfood:active{background:#cfbf9c;box-shadow:none;transform:translate(1px,1px)}
+  .food-img{max-width:100%;max-height:170px;border:2px solid #6b4a20;display:block;margin-top:6px}
+  .food-cfg-in{font-family:inherit}
+  @media(max-width:900px){
+    .main{box-sizing:border-box;padding:0 6px 80px}
+    .panel{box-sizing:border-box;max-width:100%}
+    .food-item{align-items:flex-start}
+    .food-item>span:first-child{flex:1;min-width:0}
+    .food-item .nm{word-break:break-word;line-height:1.35}
+    .food-item .nt{flex:none;text-align:right;font-size:11px;line-height:1.4}
+    .nut-row{gap:4px}
+    .nut{padding:7px 2px}
+    .nut .n{font-size:15px;line-height:1.25}
+    .nut .l,.nut .g{font-size:9px}
+    .bridge-st{max-width:76px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px;padding:2px 4px}
+    .mc-btn{font-size:13px;padding:9px 12px}
+  }
 </style>
 </head>
 <body>
@@ -269,13 +302,13 @@
   </div>
 
   <div class="sign">
-    <span id="greetTxt">欢迎来到日常小镇</span>
+    <span id="greetTxt">欢迎来到 MC 工作台</span>
     <span class="day" id="dateTxt"></span>
   </div>
 
   <div class="body">
     <div class="nav">
-      <div class="h">日常小镇</div>
+      <div class="h">MC 工作台</div>
       <div class="nav-item on" data-view="home"><img class="em" src="data:image/webp;base64,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" alt="" style="width:18px;height:18px;image-rendering:pixelated;flex:none"> 今天</div>
       <div class="nav-item" data-view="todo"><img class="em" src="data:image/webp;base64,UklGRjgBAABXRUJQVlA4TCwBAAAvn8AnEDU4ba1tTzoCvwpLUFg0Go+DGViBOZiEHfCwB0vc3Pdr654mjZJIktxoo48eHp2BR5lxG0mKnH+cy7wH//l32LaNJFkNZHSPkZQwT2b4U/EhQNn1uUjehxx8CThD9PLLD4uQoZSPs/EkQL1KUx1iB/azB84/VpChRA/NTL1aNeSm2o4v0M5QPqfqwO1Wx9gBd81zcQ1LDtoZyuycVg64memVrmvdrtZuQ3PWFukPRHUULu6aR3H9KxtW8SZwI5DZofmqhqq9Wr3wvQjQK2mWpA5tQJQfAWfIbWjVC9+DQNWG28vyOR2APgxRX7qGpdwJ0PS0l7lPK7PThyHqy2rD0l7Wh4NUzlAM0UZFzekMtXOQyhmyoepudSXQQZHKGZuhPu5wAZ3pDTM=" alt="" style="width:18px;height:18px;image-rendering:pixelated;flex:none"> 今日待办</div>
       <div class="nav-item" data-view="board"><img class="em" src="data:image/webp;base64,UklGRk4EAABXRUJQVlA4TEIEAAAvK8FKEJegJpKtZubX30Zw8QkVNUpwghmGmhIFyUuyoSaSFGmLGDEghJAIAeiiiFFwCs7Tp7a2lQaoGYAJqDBNaulaHru0gDskAUGR/6NF/nDCt4EEhVpGIvrqxt7FTLOK2g0Q+f8LYc45kFmpyrtqsyTYRpLkpHZY7yD/gDUnCsyI/k+APjhejngJbIkERAYBUihe05+wJog0kYKJIIeBDOAkpFAateIsWw7oxBlsOFje2R8UhQRJkuM2GpA+///WPUkBPkgQM4OIrt3wERGOEElSpOk+CA7XsbX7Phqq+Pa/fPtfIJfN7B6UzN6ASScgUhd4dAk0GgIWDQOJXMAhSNithTy6+shAbxGA+n65RwQ6wq8D1KuXTnUgXRdw6AKyNYBBDUCyBjGgQciVAxdyQKqc6MgJmQrAQQDQQjoHb2oh5Y+ZfhwuEQVTj8PtwMFFnQsE1ob7BpBwqHMh4dA6AQRHixdK7VLfm7yUcIt5dAuHKzV/KfYWIBAhFmc4BQQOQcGgwOBadLL0RQhnQcJiH7Bjtnq1KMwylSRiGkFCkXsfjYUixu4zpRlZgoQiv50XLflZQoUAYcKAdIFo5xUm8yEeMcGoIKHgGVe7Ep4sXSHCSZzwcSiWmcqqMJepJBHTCBJWufdRU6U4aqY0I0uQsMpv50VLfi4UFPbqrzEf+2bGCDgWHV/t5hKRuHnEBKPiAgIKbbxdCU+uXSHCSZTwUXtdvOfnecqTbZjwJPQCk0gofiVLb/zKlWLkSTVAyXDp+TlY+vEU9Ogqhu90AI6dDA747RSP+O0TEYyLCkDJcOnp6UKQ8AyqD1XsY3as6zzlwX5gwgOoCzyoXdw5V4oXd86VYuRJNUDJcGldg6UfD0GPDsOQx0MAVhi/gH+d4hF/fSKCcVHBmMjALxq1S1+EcBYk3OxjdtSpnoLCrFNJIqYRJFS597GkSnEsmdKMLOlGhiChImgUr9kCUhdXK2YcEHMJEoiW/trFIyYYFReMiA284lG79MQIR3HCh7S5tl3iXNtUkohpJBNTCBJ2ybVLqiQjTbKRIumIlvysFBT26u9hs5IYECIU8IvGGS4hwbCwYEho4BaO2qUrRDiJEupH7f9mtc1TmkhMJJGYREIxgRhB9kEp3OdJNUDJcGnbgqUfLejRrZiOvf+0V2QOCBAMeMQkyrioAJQMl1q7ECB0BAnb9kH72PsLq1G0UiaSSEwioWiKlftK50ox8qQa/7Hm2koJln60qEf32e7/phUYCqhr+0KED9sHlG/GfOxrLwT+kHbs9pIUYhpBwq73r3MSUr9LninNyBIk7KDaeTuC6RCe2588zEpiQIhQwC0ccAkJMCiskh0SGgwLy810hQgnUcL76UP/zGQBhSL1AlNIKtIlF6mSjDRBQgGwAG9NkPSLRwoSGotORIRYwCse8IgJRsUFI+KDpSNCWE5ihKXZv14Y" alt="" style="width:18px;height:18px;image-rendering:pixelated;flex:none"> 看板</div>
@@ -316,8 +349,15 @@
           </div>
           <div class="cstat" id="remindStat">提醒时间到且页面开着时,弹出 MC 风格提醒</div>
           <div class="line" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            <span>DeepSeek Key</span>
+            <input class="mini-in" id="dsKeyIn" type="password" placeholder="sk-... 只存在这台手机"
+              style="width:180px;font-family:inherit" oninput="dsKeySave(this.value)">
+            <span class="cstat" id="dsKeySt"></span>
+          </div>
+          <div class="cstat">填一次长期有效。填了以后在手机流量/外网也能用 AI 算营养;不填就只能在家开着电脑时用。</div>
+          <div class="line" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
             <span>版本</span>
-            <span class="cstat" id="verTag" style="font-weight:700;color:#8a6d1a">v9</span>
+            <span class="cstat" id="verTag" style="font-weight:700;color:#8a6d1a">v11</span>
           </div>
           <div class="line" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
             <span>手动备份</span>
@@ -653,6 +693,38 @@
       <!-- ===== 健身 ===== -->
       <div class="view" id="v-fit">
         <div class="page-h">🏋️ 健身 · 减脂恢复</div>
+
+        <!-- AI 食物估算 -->
+        <div class="panel" id="foodPanel">
+          <div class="ph">🍽 吃了什么 · AI 算营养</div>
+          <div class="cstat">拍照或打一句人话都行。AI 算出碳水 / 蛋白 / 脂肪 / 热量,再对照你今天的 2000 kcal 目标告诉你还差什么。</div>
+          <textarea class="mini-in" id="foodTxt" rows="2" placeholder="例:一碗兰州拉面加了个卤蛋 / 便利店鸡胸肉沙拉"
+            style="width:100%;margin-top:8px;box-sizing:border-box;resize:vertical;font-family:inherit;line-height:1.5"></textarea>
+          <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center">
+            <button class="checkin" onclick="document.getElementById('foodFile').click()">📷 照片</button>
+            <input type="file" id="foodFile" accept="image/*" style="display:none" onchange="foodPick(this)">
+            <button class="checkin" id="foodBtn" onclick="foodAnalyze()">⚡ 算一下</button>
+            <span class="mini" id="foodSt"></span>
+          </div>
+          <div id="foodPrev"></div>
+          <div id="foodOut"></div>
+        </div>
+
+        <!-- 今日进度 -->
+        <div class="panel" id="foodProgPanel">
+          <div class="ph">📊 今天吃到哪了</div>
+          <div id="foodProg"></div>
+          <div id="foodGap" class="cstat" style="margin-top:4px"></div>
+          <div id="foodCfg" style="margin-top:10px"></div>
+        </div>
+
+        <!-- ADHD 吃饭守卫 -->
+        <div class="panel" id="adhdPanel">
+          <div class="ph">⏰ 吃饭守卫 · 忘了吃也能救</div>
+          <div id="adhdTip"></div>
+          <div class="mini" style="margin-top:10px">懒得想就点一下,直接记进去(乳糖不耐安全):</div>
+          <div id="adhdQuick" style="margin-top:2px"></div>
+        </div>
         <div class="row2" style="margin-bottom:10px">
           <div class="panel">
             <div class="ph">⚖️ 体重记录(与今日待办打通)</div>
@@ -767,7 +839,7 @@
             </div>
             <div class="craft-out" id="micOut" style="color:#a09070;font-size:12px;margin-top:8px">完整语音对话:说话 → AI 回答 → 自动朗读。识别转文字后会自动提问。</div>
           </div>
-          <div class="ph" style="margin-top:12px">方法卡索引(星空工作台核心:AI 调卡片判断)</div>
+          <div class="ph" style="margin-top:12px">方法卡索引(MC 工作台核心:AI 调卡片判断)</div>
           <div class="grid4">
             <div class="cardbtn" onclick="useCard('STAR')">🃏 <b>STAR</b></div>
             <div class="cardbtn" onclick="useCard('SWOT')">🃏 <b>SWOT</b></div>
@@ -881,9 +953,9 @@ function loadState(){
       focus:[],tasks:[],money:[],diary:[],weight:[],habits:{fit:[],study:[],brief:[]},
       study:{min:0,path:0},english:{word:[],phrase:[],sent:[]},englog:[],pomoToday:0,pomoDone:[],nutToday:[],nutHis:[],ex:[],
       mood:[],moodCur:'平静',sport:[],wb:[],wbProg:{},projDone:[],
-      lastRev:0,deviceId:'',remind:{enabled:false,time:'20:00',lastFired:''},syncEnabled:false,
+      lastRev:0,deviceId:'',remind:{enabled:false,time:'20:00',lastFired:''},syncEnabled:false,foodProfile:{wt:65,mode:'repair'},
       dragon:{day:'',hits:0,hp:100,dead:false}},s);
-  }catch(e){ return {day:new Date().toDateString(),xp:640,coin:1250,water:0,doneToday:0,lv:7,focus:[],tasks:[],money:[],diary:[],weight:[],habits:{fit:[],study:[],brief:[]},study:{min:0,path:0},english:{word:[],phrase:[],sent:[]},englog:[],pomoToday:0,pomoDone:[],nutToday:[],nutHis:[],ex:[],mood:[],moodCur:'平静',sport:[],wb:[],wbProg:{},projDone:[],lastRev:0,deviceId:'',remind:{enabled:false,time:'20:00',lastFired:''},syncEnabled:false,dragon:{day:'',hits:0,hp:100,dead:false}}; }
+  }catch(e){ return {day:new Date().toDateString(),xp:640,coin:1250,water:0,doneToday:0,lv:7,focus:[],tasks:[],money:[],diary:[],weight:[],habits:{fit:[],study:[],brief:[]},study:{min:0,path:0},english:{word:[],phrase:[],sent:[]},englog:[],pomoToday:0,pomoDone:[],nutToday:[],nutHis:[],ex:[],mood:[],moodCur:'平静',sport:[],wb:[],wbProg:{},projDone:[],lastRev:0,deviceId:'',remind:{enabled:false,time:'20:00',lastFired:''},syncEnabled:false,foodProfile:{wt:65,mode:'repair'},dragon:{day:'',hits:0,hp:100,dead:false}}; }
 }
 function saveState(){ try{ localStorage.setItem(STORE_KEY,JSON.stringify(state)); }catch(e){} }
 
@@ -1041,9 +1113,9 @@ function mTab(v){
 async function checkBridge(){
   const el=document.getElementById('bridgeSt');
   try{ const r=await fetch(BRIDGE+'/health'); const d=await r.json();
-    el.textContent='桥:在线 · Ollama'+(d.ollama?'✅':'❌')+' · DeepSeek'+(d.deepseek_configured?'✅':'未配');
+    el.textContent='已连接'+(d.deepseek_configured?' · AI 可用':'');
     el.className='bridge-st on';
-  }catch(e){ el.textContent='桥:离线(启动start_bridge.bat)'; el.className='bridge-st off'; }
+  }catch(e){ el.textContent='未连接·仅本机'; el.className='bridge-st off'; }
 }
 
 let _briFull='';
@@ -1535,6 +1607,250 @@ function renderNut(){
     <div class="nut"><div class="n">${sum.k} kcal</div><div class="l">能量</div><div class="g">见计算器目标</div></div>`;
 }
 
+// ============ v11 · AI 食物估算 + 吃饭守卫 ============
+function esc(x){ return String(x==null?'':x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+
+const FOOD_QUICK=[
+  {n:'卤蛋2个',p:13,c:2,f:10,k:150},
+  {n:'即食鸡胸100g',p:23,c:2,f:2,k:130},
+  {n:'豆浆400ml',p:12,c:8,f:8,k:150},
+  {n:'米饭一碗',p:5,c:56,f:1,k:260},
+  {n:'无乳糖酸奶200g',p:7,c:12,f:6,k:130},
+  {n:'香蕉一根',p:1,c:27,f:0,k:105},
+  {n:'全麦面包2片',p:6,c:26,f:2,k:150},
+  {n:'牛奶250ml',p:8,c:12,f:8,k:155,no:'乳糖不耐,胀气就换无乳糖'}
+];
+
+const FOOD_SYS='你是食物营养估算助手,服务对象固定是 XWY:'
+ +'男,65kg,减脂期但长期吃得过少(日均1200-1500kcal),近期因热量缺口过大失眠;'
+ +'每日目标 2000kcal / 蛋白130g / 脂肪60g / 碳水235g;'
+ +'乳糖不耐(牛奶、普通酸奶、乳清浓缩会胀气腹泻);ADHD(做饭启动困难、常忘记吃饭)。'
+ +'规则:按中国常见份量估(一碗面600-700g、一份快餐500g、一个包子80g、一碗饭200g);'
+ +'看不清就按最常见同款估并把 conf 标低,在 comment 里说明你的假设;'
+ +'禁止输出"多吃蔬菜/注意均衡/多喝水"这类废话,要落到具体食物+克数。'
+ +'只输出一个JSON对象,不要代码块不要解释:'
+ +'{"items":[{"name":"","portion":"","p":0,"c":0,"f":0,"k":0,"conf":"高|中|低"}],'
+ +'"total":{"p":0,"c":0,"f":0,"k":0},"comment":"一句话这顿的亮点或问题",'
+ +'"adhd":"一句话最省事的补救食物","next":"一句话接下来补什么"}';
+
+let foodImg=null, foodRes=null, foodBusy=false;
+
+function foodProfile(){ return Object.assign({wt:65,mode:'repair'}, state.foodProfile||{}); }
+function foodTarget(){
+  const pr=foodProfile(), wt=pr.wt||65, r10=function(x){return Math.round(x/10)*10;};
+  if(pr.mode==='cut')  return {k:r10(wt*28),p:Math.round(wt*2.0),c:Math.round(wt*2.2),f:Math.round(wt*0.8)};
+  if(pr.mode==='bulk') return {k:r10(wt*34),p:Math.round(wt*2.0),c:Math.round(wt*4.2),f:Math.round(wt*1.0)};
+  if(pr.mode==='keep') return {k:r10(wt*31),p:Math.round(wt*1.8),c:Math.round(wt*3.2),f:Math.round(wt*0.9)};
+  return {k:2000,p:130,c:235,f:60};
+}
+function foodSum(){
+  return state.nutToday.reduce(function(s,n){
+    return {p:s.p+(+n.p||0),c:s.c+(+n.c||0),f:s.f+(+n.f||0),k:s.k+(+n.k||0)};
+  },{p:0,c:0,f:0,k:0});
+}
+
+function renderFood(){
+  const el=document.getElementById('foodProg'); if(!el) return;
+  const T=foodTarget(), S=foodSum();
+  const rows=[['热量',S.k,T.k,'kcal'],['蛋白质',S.p,T.p,'g'],['碳水',S.c,T.c,'g'],['脂肪',S.f,T.f,'g']];
+  el.innerHTML=rows.map(function(r){
+    const n=r[0], v=Math.round(r[1]), g=r[2], u=r[3];
+    const raw=g?Math.round(v/g*100):0, pct=Math.min(100,raw);
+    const cls=v>g*1.12?'over':(n==='热量'&&raw<45?'warn':'');
+    return '<div class="prow"><span>'+n+' <b>'+v+'</b> / '+g+u+'</span><span>'+raw+'%</span></div>'
+         + '<div class="pbar"><i class="'+cls+'" style="width:'+pct+'%"></i></div>';
+  }).join('');
+  const gapK=Math.max(0,T.k-S.k), gapP=Math.max(0,T.p-S.p), h=new Date().getHours();
+  let tip;
+  if(S.k===0) tip='今天还没记任何吃的。吃一口就记一口,比晚上回忆一整天容易一百倍。';
+  else if(gapK>700&&h>=19) tip='今天只有 '+Math.round(S.k)+' kcal,还差 '+gapK+'。你 10 月就是这么吃到失眠的——现在补 300-400 kcal,比明天补有用。';
+  else if(gapP>40) tip='蛋白还差 '+gapP+'g。一袋即食鸡胸 100g = 23g,或者两盒无乳糖酸奶。';
+  else if(S.k>T.k*1.15) tip='今天超了 '+Math.round(S.k-T.k)+' kcal。不算灾难,明天正常吃,别用少吃来惩罚自己。';
+  else tip='节奏在轨道上,照这样吃到晚上就够。';
+  const gEl=document.getElementById('foodGap'); if(gEl) gEl.textContent=tip;
+
+  const cfg=document.getElementById('foodCfg');
+  if(cfg&&!cfg.dataset.done){
+    const pr=foodProfile();
+    cfg.innerHTML='<div class="mini" style="margin-bottom:4px">目标依据(改一次就够)</div>'
+      +'<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">'
+      +'<input class="mini-in food-cfg-in" id="fpWt" type="number" value="'+pr.wt+'" style="width:62px;flex:none" placeholder="体重kg">'
+      +'<select class="mini-in food-cfg-in" id="fpMode" style="flex:1;min-width:118px;max-width:190px">'
+      +'<option value="repair">修复期(吃够不失眠)</option>'
+      +'<option value="cut">减脂</option><option value="keep">维持</option><option value="bulk">增肌</option></select>'
+      +'<button class="checkin" onclick="foodSaveCfg()">保存</button></div>';
+    const sm=document.getElementById('fpMode'); if(sm) sm.value=pr.mode;
+    cfg.dataset.done='1';
+  }
+}
+function foodSaveCfg(){
+  const wt=parseFloat(document.getElementById('fpWt').value)||65;
+  const mode=document.getElementById('fpMode').value;
+  state.foodProfile={wt:wt,mode:mode};
+  saveState(); renderFood();
+  const T=foodTarget();
+  document.getElementById('foodGap').textContent='目标已改为 '+T.k+' kcal / 蛋白 '+T.p+'g / 碳水 '+T.c+'g / 脂肪 '+T.f+'g';
+}
+
+function adhdGuard(){
+  const el=document.getElementById('adhdTip'); if(!el) return;
+  const h=new Date().getHours(), S=foodSum();
+  const marks=state.nutToday.map(function(x){ return x.t?parseInt(x.t,10):null; })
+                .filter(function(x){ return x!==null&&!isNaN(x); });
+  const early=marks.some(function(t){return t<=10;});
+  const noon=marks.some(function(t){return t>=11&&t<=15;});
+  const eve=marks.some(function(t){return t>=17;});
+  let msg;
+  if(h<6) msg='凌晨 '+h+' 点。要么去睡,要么吃点东西再睡——空腹过夜更容易失眠。';
+  else if(h<10&&!early) msg='现在 '+h+' 点,今天还没有早餐记录。<b>2 个卤蛋 + 400ml 豆浆</b>,不用开火,3 分钟能吃完。';
+  else if(h>=11&&h<15&&!noon&&S.k<800) msg='已经 '+h+' 点,才吃了 '+Math.round(S.k)+' kcal。别等饿到发慌——饿过头会让你只想吃零食。'+(S.p<60?' 顺手补蛋白:即食鸡胸一袋。':'');
+  else if(h>=15&&h<19&&!eve&&S.k<1300) msg='下午 '+h+' 点了,今天的量还差得远。现在补一顿,比晚上 10 点猛吃强。';
+  else if(h>=20&&S.k<1500) msg='晚上 '+h+' 点,今天只有 <b>'+Math.round(S.k)+' kcal</b>。这个缺口会直接变成失眠。睡前 1 小时内:无乳糖酸奶 200g + 香蕉一根,300 kcal 左右。';
+  else if(h>=23) msg='快睡了。真饿就来 200ml 无乳糖牛奶 + 2 片全麦面包,别硬扛。';
+  else if(marks.length===0) msg='今天还没有任何记录。记得吃,也记得记。';
+  else msg='今天记了 '+state.nutToday.length+' 次,已摄入 '+Math.round(S.k)+' kcal。饭后顺手记一条,最省脑子。';
+  el.innerHTML='<div class="adhd-tip">'+msg+'</div>';
+
+  const q=document.getElementById('adhdQuick');
+  if(q&&!q.dataset.done){
+    q.innerHTML=FOOD_QUICK.map(function(f,i){
+      return '<button class="qfood" onclick="quickFood('+i+',this)" title="'+(f.no||'')+'">'+f.n+'</button>';
+    }).join('');
+    q.dataset.done='1';
+  }
+}
+function quickFood(i,btn){
+  const q=FOOD_QUICK[i], now=new Date();
+  const rec={p:q.p,c:q.c,f:q.f,k:q.k,t:now.toTimeString().slice(0,5),src:'quick',n:q.n};
+  state.nutToday.push(rec); logOp('add','nut',rec);
+  renderNut(); renderFood(); adhdGuard(); addXP(2); saveState();
+  btn.textContent='已记 ✓'; btn.style.background='#4a7c2f'; btn.style.color='#fff';
+}
+
+function foodPick(inp){
+  const f=inp.files&&inp.files[0]; if(!f) return;
+  const st=document.getElementById('foodSt');
+  st.textContent='处理照片…';
+  const rd=new FileReader();
+  rd.onload=function(e){
+    const im=new Image();
+    im.onload=function(){
+      const max=1024; let w=im.width, hh=im.height;
+      if(Math.max(w,hh)>max){ const sc=max/Math.max(w,hh); w=Math.round(w*sc); hh=Math.round(hh*sc); }
+      const cv=document.createElement('canvas'); cv.width=w; cv.height=hh;
+      cv.getContext('2d').drawImage(im,0,0,w,hh);
+      foodImg=cv.toDataURL('image/jpeg',0.82);
+      document.getElementById('foodPrev').innerHTML='<img class="food-img" src="'+foodImg+'">';
+      st.textContent='照片就绪 '+Math.round(foodImg.length/1400)+'KB';
+    };
+    im.onerror=function(){ st.textContent='这张图读不出来,换一张'; };
+    im.src=e.target.result;
+  };
+  rd.readAsDataURL(f);
+}
+
+async function aiFood(text,img){
+  let berr='';
+  try{
+    const r=await fetch(BRIDGE+'/api/v1/food',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text:text,image:img||'',mime:'image/jpeg'})});
+    if(r.status!==404){
+      const d=await r.json();
+      if(d&&d.ok) return d;
+      berr=(d&&d.error)?d.error:'桥返回异常';
+    }
+  }catch(e){ berr='桥连不上'; }
+  const key=(localStorage.getItem('xwy_ds_key')||'').trim();
+  if(!key) return {ok:false,error:(berr||'桥不可用')+'。在外网用要先在「更多」页填 DeepSeek Key,填一次长期有效。'};
+  try{
+    const content=[{type:'text',text:'【用户输入】'+(text||'看这张照片,估算里面所有食物的营养')}];
+    if(img) content.push({type:'image_url',image_url:{url:img}});
+    const r=await fetch('https://api.deepseek.com/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model:'deepseek-chat',max_tokens:2600,temperature:0.3,
+        messages:[{role:'system',content:FOOD_SYS},{role:'user',content:content}]})});
+    const d=await r.json();
+    if(d.error) return {ok:false,error:'DeepSeek: '+String((d.error&&d.error.message)||'').slice(0,120)};
+    const raw=(d.choices&&d.choices[0]&&d.choices[0].message.content)||'';
+    const i=raw.indexOf('{'), j=raw.lastIndexOf('}');
+    if(i<0||j<=i) return {ok:false,error:'AI 没按格式回,再点一次'};
+    const o=JSON.parse(raw.slice(i,j+1)); o.ok=true; return o;
+  }catch(e){ return {ok:false,error:'直连失败: '+e.message}; }
+}
+
+async function foodAnalyze(){
+  if(foodBusy) return;
+  const text=document.getElementById('foodTxt').value.trim();
+  if(!text&&!foodImg){ alert('打个字或者放张照片'); return; }
+  foodBusy=true;
+  const btn=document.getElementById('foodBtn'), st=document.getElementById('foodSt');
+  btn.disabled=true; btn.textContent='算中…'; st.textContent='AI 正在看';
+  let d;
+  try{ d=await aiFood(text,foodImg); }
+  catch(e){ d={ok:false,error:'出错: '+e.message}; }
+  foodRender(d);
+  foodBusy=false; btn.disabled=false; btn.textContent='⚡ 算一下';
+  if(foodRes&&foodRes.ok) st.textContent='';
+}
+
+function foodRender(d){
+  const out=document.getElementById('foodOut');
+  if(!d||!d.ok){
+    out.innerHTML='<div class="cstat" style="color:#a02020;margin-top:8px">'+esc((d&&d.error)||'没拿到结果')+'</div>';
+    return;
+  }
+  foodRes=d;
+  const items=d.items||[], t=d.total||{p:0,c:0,f:0,k:0};
+  const li=items.map(function(i){
+    return '<div class="food-item"><span><span class="nm">'+esc(i.name||'?')+'</span><br>'
+      +'<span class="pt">'+esc(i.portion||'')+(i.conf?' · 把握'+esc(i.conf):'')+'</span></span>'
+      +'<span class="nt">'+Math.round(i.p||0)+'/'+Math.round(i.c||0)+'/'+Math.round(i.f||0)+'g<br>'
+      +Math.round(i.k||0)+' kcal</span></div>';
+  }).join('');
+  out.innerHTML='<div style="margin-top:10px">'+li+'</div>'
+    +'<div class="nut-row" style="margin:8px 0">'
+    +'<div class="nut"><div class="n">'+Math.round(t.p||0)+'</div><div class="l">蛋白 g</div></div>'
+    +'<div class="nut"><div class="n">'+Math.round(t.c||0)+'</div><div class="l">碳水 g</div></div>'
+    +'<div class="nut"><div class="n">'+Math.round(t.f||0)+'</div><div class="l">脂肪 g</div></div>'
+    +'<div class="nut"><div class="n">'+Math.round(t.k||0)+'</div><div class="l">kcal</div></div></div>'
+    +(d.comment?'<div class="cstat" style="margin-bottom:6px">'+esc(d.comment)+'</div>':'')
+    +(d.next?'<div class="cstat" style="margin-bottom:8px"><b>接下来:</b> '+esc(d.next)+'</div>':'')
+    +(d.adhd?'<div class="adhd-tip" style="margin-bottom:8px">'+esc(d.adhd)+'</div>':'')
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap">'
+    +'<button class="mc-btn gold" onclick="foodCommit()">✓ 记入今天</button>'
+    +'<button class="mc-btn" onclick="foodClear()">重来</button></div>';
+}
+
+function foodCommit(){
+  if(!foodRes||!foodRes.ok) return;
+  const t=foodRes.total||{}, now=new Date();
+  const rec={p:Math.round(t.p||0),c:Math.round(t.c||0),f:Math.round(t.f||0),k:Math.round(t.k||0),
+    t:now.toTimeString().slice(0,5),src:'ai',
+    n:(foodRes.items||[]).map(function(i){return i.name;}).join('+').slice(0,40)};
+  state.nutToday.push(rec); logOp('add','nut',rec);
+  renderNut(); renderFood(); adhdGuard(); addXP(4); saveState();
+  document.getElementById('foodOut').insertAdjacentHTML('beforeend',
+    '<div class="saved" style="margin-top:6px">已记入今天,这顿 '+rec.k+' kcal / 蛋白 '+rec.p+'g</div>');
+  document.getElementById('foodTxt').value='';
+  document.getElementById('foodPrev').innerHTML='';
+  document.getElementById('foodFile').value='';
+  foodImg=null;
+}
+function dsKeySave(v){
+  const t=(v||'').trim();
+  if(t) localStorage.setItem('xwy_ds_key',t); else localStorage.removeItem('xwy_ds_key');
+  const st=document.getElementById('dsKeySt');
+  if(st){ st.textContent=t?'已保存,随时能用':'已清除'; st.style.color=t?'#3c6a20':'#8a5a2a'; }
+}
+function foodClear(){
+  foodRes=null; foodImg=null;
+  ['foodOut','foodPrev'].forEach(function(id){ const e=document.getElementById(id); if(e) e.innerHTML=''; });
+  const tx=document.getElementById('foodTxt'); if(tx) tx.value='';
+  const fi=document.getElementById('foodFile'); if(fi) fi.value='';
+  const st=document.getElementById('foodSt'); if(st) st.textContent='';
+}
+
 // ============ 碳蛋脂目标计算器(增肌/减脂/维持) ============
 function calcGoal(){
   const goal=document.getElementById('nutGoal').value;
@@ -1959,6 +2275,10 @@ function renderMore(){
     rb.textContent=state.remind.enabled?'关闭':'开启';
     rb.style.background=state.remind.enabled?'#8a5a2a':'#6b8a40';
   }
+  const dk=document.getElementById('dsKeyIn'), dks=document.getElementById('dsKeySt');
+  if(dk&&!dk.value){ const k=localStorage.getItem('xwy_ds_key')||''; if(k){ dk.value=k; } }
+  if(dks){ dks.textContent=(localStorage.getItem('xwy_ds_key')||'')?'已保存,随时能用':'未填';
+    dks.style.color=(localStorage.getItem('xwy_ds_key')||'')?'#3c6a20':'#8a5a2a'; }
   const sb=document.getElementById('syncBtn');
   if(sb){ sb.textContent=state.syncEnabled?'开':'关';
     sb.style.background=state.syncEnabled?'#2a6a2a':'#777';
@@ -2034,14 +2354,14 @@ function mcAlertClose(){ document.getElementById('mcAlertBox').style.display='no
 // ============ 全量重渲染(同步拉取到增量后调用) ============
 function renderAll(){
   renderFocus(); renderTasks(); renderMoney(); renderDiary(); renderStudy(); renderEnglish();
-  renderHabits(); renderWeight(); renderNut(); renderEx(); renderSport(); renderMood(); renderWb();
+  renderHabits(); renderWeight(); renderNut(); renderFood(); adhdGuard(); renderEx(); renderSport(); renderMood(); renderWb();
   renderAch(); renderSide(); renderBoard(); renderDash(); renderDragon(); renderPomo();
   updateStats();
 }
 
 // ============ 初始化 ============
 renderFocus(); renderTasks(); renderMoney(); renderDiary(); renderStudy(); renderEnglish();
-renderHabits(); renderWeight(); renderNut(); renderEx(); renderSport(); renderMood(); renderWb(); renderAch(); renderSide(); renderBoard(); renderDash(); renderDragon(); renderPomo(); updateStats();
+renderHabits(); renderWeight(); renderNut(); renderFood(); adhdGuard(); renderEx(); renderSport(); renderMood(); renderWb(); renderAch(); renderSide(); renderBoard(); renderDash(); renderDragon(); renderPomo(); updateStats();
 checkBridge(); loadBriefing(); loadProjects();
 // 手机版入口:窄屏默认显示「今天概览」,宽屏保持桌面首页
 if(window.innerWidth<=640){ mTab('home'); }

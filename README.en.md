@@ -1,7 +1,7 @@
 # xwy-workstation
 
 #### Description
-XWY 工作台手机版(个人使用)
+MC 工作台手机版(个人使用)
 
 #### Software Architecture
 Software architecture description
